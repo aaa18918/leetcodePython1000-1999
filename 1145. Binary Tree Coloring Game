@@ -23,3 +23,40 @@ Constraints:
 root is the root of a binary tree with n nodes and distinct node values from 1 to n.
 n is odd.
 1 <= x <= n <= 100
+
+
+O(n) time, O(???) space
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def btreeGameWinningMove(self, root, n, x):
+        """
+        :type root: TreeNode
+        :type n: int
+        :type x: int
+        :rtype: bool
+        """
+        
+        def countNode(node):
+            if not node:
+                return 0
+            
+            left, right = countNode(node.left), countNode(node.right)
+            
+            if node.val == x:
+                self.player1_left_count, self.player1_right_count = left, right
+            
+            return left+right+1
+        
+        countNode(root)
+        
+        return max(
+            n-self.player1_left_count-self.player1_right_count-1,
+            self.player1_left_count,
+            self.player1_right_count,
+        ) > n/2
