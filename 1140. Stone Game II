@@ -21,3 +21,38 @@ Constraints:
 
 1 <= piles.length <= 100
 1 <= piles[i] <= 10 ^ 4
+
+
+O(???) time, O(???) space
+class Solution(object):
+    def stoneGameII(self, piles):
+        """
+        :type piles: List[int]
+        :rtype: int
+        """
+        
+        sums = [0]*len(piles)
+        
+        cur = 0
+        for i in range(len(piles)-1, -1, -1):
+            cur += piles[i]
+            sums[i] = cur
+        
+        dp = [[0]*len(piles) for _ in range(len(piles))]
+        
+        def helper(i, m):
+            if dp[i][m]:
+                return dp[i][m]
+            
+            if m*2 >= len(piles)-i:
+                return sums[i]
+            
+            min_val = sys.maxint
+            for x in range(1, 2*m+1):
+                min_val = min(min_val, helper(i+x, max(m, x)))
+            
+            dp[i][m] = sums[i]-min_val
+            
+            return sums[i]-min_val
+        
+        return helper(0, 1)
