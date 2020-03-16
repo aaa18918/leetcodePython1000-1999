@@ -37,3 +37,88 @@ n == mat[0].length
 1 <= m <= 3
 1 <= n <= 3
 mat[i][j] is 0 or 1.
+
+
+O(???) time, O(???) space
+class Solution(object):
+    def minFlips(self, mat):
+        """
+        :type mat: List[List[int]]
+        :rtype: int
+        """
+        
+        self.m, self.n = len(mat), len(mat[0])
+        
+        diff = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        
+        def valid(mat):
+            for i in range(self.m):
+                for j in range(self.n):
+                    if mat[i][j] == 1:
+                        return False
+            
+            return True
+        
+        def encode(mat):
+            res = 0
+            for i in range(self.m):
+                for j in range(self.n):
+                    res = (res<<1)+mat[i][j]
+            
+            return res
+        
+        def decode(num):
+            mat = [[0]*self.n for _ in range(self.m)]
+            
+            while num:
+                for i in range(self.m):
+                    for j in range(self.n):
+                        if num&1 == 1:
+                            mat[i][j] = 1
+                        
+                        num >>= 1
+            
+            return mat
+        
+        if valid(mat):
+            return 0
+        
+        my_set = set()
+        
+        code = encode(mat)
+        
+        my_set.add(code)
+        my_queue = collections.deque([(code, 0)])
+        
+        while my_queue:
+            code, count = my_queue.popleft()
+            
+            mat = decode(code)
+            
+            for i in range(self.m):
+                for j in range(self.n):
+                    mat[i][j] = 1-mat[i][j]
+                    
+                    for d in diff:
+                        new_i, new_j = i+d[0], j+d[1]
+                        if 0 <= new_i < self.m and 0 <= new_j < self.n:
+                            mat[new_i][new_j] = 1-mat[new_i][new_j]
+                    
+                    if valid(mat):
+                        return count+1
+                    
+                    new_code = encode(mat)
+                    
+                    if new_code not in my_set:
+                        my_set.add(new_code)
+                        
+                        my_queue.append((new_code, count+1))
+                    
+                    mat[i][j] = 1-mat[i][j]
+                    
+                    for d in diff:
+                        new_i, new_j = i+d[0], j+d[1]
+                        if 0 <= new_i < self.m and 0 <= new_j < self.n:
+                            mat[new_i][new_j] = 1-mat[new_i][new_j]
+        
+        return -1
